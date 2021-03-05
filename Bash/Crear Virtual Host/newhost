@@ -1,0 +1,35 @@
+#!/bin/bash
+
+echo "Virtual Host Apache2 Install....."
+
+read -p "Nombre del Servidor Virtual : " NAME
+
+sudo mkdir -p /var/www/$NAME
+sudo chmod 777 /var/www/$NAME
+echo "Directorio Creado Exitosamente en /var/www/*"
+
+sudo chmod 777 /etc/hosts
+sudo echo "127.0.0.1 " $NAME >>/etc/hosts
+
+echo "Host Creado Exitosamente...!"
+
+Creacion del host Virtual de Apache
+APACHE_LOG_DIR='${APACHE_LOG_DIR}'
+
+CONF="<VirtualHost *:80>
+    ServerAdmin admin@${NAME}
+    ServerName ${NAME}
+    ServerAlias www.${NAME}
+    DocumentRoot /var/www/${NAME}
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>"
+sudo echo "${CONF}" >/etc/apache2/sites-available/${NAME}.conf
+
+echo "El Archivo *.conf a sido Creado Exitosamente...!"
+
+echo "Actualizando Configuraciones"
+sudo a2ensite $NAME.conf
+
+echo "Reiniciando Apache2"
+sudo systemctl restart apache2
